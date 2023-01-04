@@ -1,0 +1,21 @@
+[package]
+name = "high-frequency"
+version = "0.0.1"
+edition = "2018"
+authors = [
+    "Cloud <cloudweisz@gmail.com>"
+]
+keywords = [
+    "trade",
+   "high-frequency",
+]
+
+homepage = "https://github.com/KZen-networks/multi-party-ecdsa"
+repository = "https://github.com/KZen-networks/multi-party-ecdsa"
+license = "GPL-3.0-or-later"
+categories = ["cryptography"]
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+bian-rs = { git = "https://github.com/PrivateRookie/bian-rs.git", branch = "main" }
+dotenv = "0.15.0"
