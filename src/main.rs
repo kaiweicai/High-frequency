@@ -5,6 +5,7 @@ use url;
 const BASE_WS_URL:&str = "wss://fstream.binance.com";
 const TEST_BASE_WS_URL:&str = "wss://stream.binancefuture.com";
 
+
 #[tokio::main]
 async fn main() {
     // let api_key = "xLZ0AtYGM5maQl1CKk9PzHV96eRE5TjZaoGbkdf4g4UGEeH6qv9AHWyEMT1BYBqd";
