@@ -17,13 +17,14 @@ async fn main() {
     // let result = client.index_infos().await.unwrap();
     // dbg!("result is: {:?}", result);
 
-    let client = init_client();
-    let mut stream = client
-        .kline("btcusdt".to_string(), enums::Interval::Min1)
-        .unwrap();
-    for _ in 0..5 {
-        dbg!(stream.read_stream_single().unwrap());
-    }
+    // let client = init_client();
+    // let mut stream = client
+    //     .kline("btcusdt".to_string(), enums::Interval::Min1)
+    //     .unwrap();
+    // for _ in 0..5 {
+    //     dbg!(stream.read_stream_single().unwrap());
+    // }
+    high_frequency::grab_handicap::get_ws_order_book("btcusdt").await;
 }
 
 fn init_client() -> UFuturesWSClient {

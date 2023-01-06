@@ -1,0 +1,3 @@
+[submodule "bian-rs"]
+	path = bian-rs
+	url = git@github.com:kaiweicai/bian-rs.git

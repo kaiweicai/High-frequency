@@ -17,6 +17,6 @@ categories = ["cryptography"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-bian-rs = { git = "https://github.com/PrivateRookie/bian-rs.git", branch = "main" }
+bian-rs = { git = "https://github.com/kaiweicai/bian-rs.git", branch = "main" }
 dotenv = "0.15.0"
 url = "2.3.1"

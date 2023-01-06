@@ -2,17 +2,60 @@
 // 比如现在卖1是60买1是70, 此策略会以65为中界，65以下布满买单，65以上布满卖单, 因为需要不停的调整订单布局，暂起名为高频逼近型
 // 注意: 模拟测试GetTicker的买一卖一固定差价为1.6, 实际效果需要实盘测试
 
-use std::{env, net::ToSocketAddrs};
+use bian_rs::{response::{WebsocketResponse, self}, client::UFuturesWSClient, error::BianResult};
 
-use bian_rs::client::UFuturesWSClient;
+use crate::client::init_client;
 
-use crate::constants::TEST_BASE_WS_URL;
+// 订阅 wss://fstream.binance.com/stream?streams=btcusdt@depth
+// 开始缓存收到的更新。同一个价位，后收到的更新覆盖前面的。
+// 访问Rest接口 https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=1000获得一个1000档的深度快照
+// 将目前缓存到的信息中u< 步骤3中获取到的快照中的lastUpdateId的部分丢弃(丢弃更早的信息，已经过期)。
+// 将深度快照中的内容更新到本地orderbook副本中，并从websocket接收到的第一个U <= lastUpdateId 且 u >= lastUpdateId 的event开始继续更新本地副本。
+// 每一个新event的pu应该等于上一个event的u，否则可能出现了丢包，请从step3重新进行初始化。
+// 每一个event中的挂单量代表这个价格目前的挂单量绝对值，而不是相对变化。
+// 如果某个价格对应的挂单量为0，表示该价位的挂单已经撤单或者被吃，应该移除这个价位。
 
-pub fn init_client() -> UFuturesWSClient {
-    dotenv::dotenv().unwrap();
-    let proxy = env::var("WS_PROXY").expect("cant not find WS_PROXY env variable");
-    let proxy = Some(proxy.to_socket_addrs().unwrap().next().unwrap());
-    let mut client = UFuturesWSClient::default_endpoint(proxy);
-    client.base_url = url::Url::parse(TEST_BASE_WS_URL).unwrap();
-    client
+///获取order_book的websocket数据。
+pub async fn get_ws_order_book(symbol:&str) {
+    let ws_client = init_client();
+    let mut stream = ws_client
+        .limit_depth(symbol.to_string(), 20, 100)
+        .unwrap();
+    for _ in 0..5 {
+        dbg!(stream.read_stream_single().unwrap());
+    }
 }
+
+trait ws_connnect<R> {
+    fn limit_depth(
+        &self,
+        symbol: String,
+        level: usize,
+        freq: usize,
+    ) -> BianResult<R>;
+}
+
+// impl <R> ws_connnect<R> for UFuturesWSClient{
+//     /// 有限档深度信息
+//     ///
+//     /// 推送有限档深度信息。levels表示几档买卖单信息, 可选 5/10/20档
+//     /// Update Speed: 250ms 或 500ms 或 100ms
+//     fn limit_depth(
+//         &self,
+//         symbol: String,
+//         level: usize,
+//         freq: usize,
+//     ) -> BianResult<R> {
+//         let level = match level {
+//             10 => 10,
+//             20 => 20,
+//             _ => 5,
+//         };
+//         let channel = match freq {
+//             100 => format!("depth{}@100ms", level),
+//             500 => format!("depth{}@500ms", level),
+//             _ => format!("depth{}", level),
+//         };
+//         self.build_single(symbol, &channel)
+//     }
+// }
