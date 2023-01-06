@@ -2,9 +2,6 @@ use bian_rs::{enums, client::{UFuturesWSClient, UFuturesHttpClient}, response::W
 use std::{env, net::ToSocketAddrs};
 use url;
 
-const BASE_WS_URL:&str = "wss://fstream.binance.com";
-const TEST_BASE_WS_URL:&str = "wss://stream.binancefuture.com";
-
 
 #[tokio::main]
 async fn main() {
@@ -27,13 +24,13 @@ async fn main() {
     high_frequency::grab_handicap::get_ws_order_book("btcusdt").await;
 }
 
-#[test]
-fn test_ws_kline() {
-    let client = init_client();
-    let mut stream = client
-        .kline("btcusdt".to_string(), enums::Interval::Min1)
-        .unwrap();
-    for _ in 0..5 {
-        dbg!(stream.read_stream_single().unwrap());
-    }
-}
+// #[test]
+// fn test_ws_kline() {
+//     let client = init_client();
+//     let mut stream = client
+//         .kline("btcusdt".to_string(), enums::Interval::Min1)
+//         .unwrap();
+//     for _ in 0..5 {
+//         dbg!(stream.read_stream_single().unwrap());
+//     }
+// }

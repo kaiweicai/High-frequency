@@ -30,7 +30,6 @@ pub async fn get_ws_order_book(symbol: &str) {
     }
 }
 struct WsClient(UFuturesWSClient);
-// type CLIENT_BOX= Box<UFuturesWSClient>;
 
 impl WsClient {
     /// 有限档深度信息
