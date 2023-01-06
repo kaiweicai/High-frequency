@@ -26,7 +26,6 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 [[package]]
 name = "bian-proc"
 version = "0.2.0"
-source = "git+https://github.com/kaiweicai/bian-rs.git?branch=main#569ed1c3601e9a54ca5153431a42f2ba42343407"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -36,7 +35,6 @@ dependencies = [
 [[package]]
 name = "bian-rs"
 version = "0.2.0"
-source = "git+https://github.com/kaiweicai/bian-rs.git?branch=main#569ed1c3601e9a54ca5153431a42f2ba42343407"
 dependencies = [
  "bian-proc",
  "chrono",
@@ -374,6 +372,7 @@ dependencies = [
  "bian-rs",
  "dotenv",
  "tokio",
+ "tungstenite",
  "url",
 ]
 

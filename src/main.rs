@@ -27,15 +27,6 @@ async fn main() {
     high_frequency::grab_handicap::get_ws_order_book("btcusdt").await;
 }
 
-fn init_client() -> UFuturesWSClient {
-    dotenv::dotenv().unwrap();
-    let proxy = env::var("WS_PROXY").expect("cant not find WS_PROXY env variable");
-    let proxy = Some(proxy.to_socket_addrs().unwrap().next().unwrap());
-    let mut client = UFuturesWSClient::default_endpoint(proxy);
-    client.base_url = url::Url::parse(TEST_BASE_WS_URL).unwrap();
-    client
-}
-
 #[test]
 fn test_ws_kline() {
     let client = init_client();
