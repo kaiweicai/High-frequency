@@ -2,13 +2,30 @@
 // 比如现在卖1是60买1是70, 此策略会以65为中界，65以下布满买单，65以上布满卖单, 因为需要不停的调整订单布局，暂起名为高频逼近型
 // 注意: 模拟测试GetTicker的买一卖一固定差价为1.6, 实际效果需要实盘测试
 
+use std::{collections::HashMap, iter::Map};
+
 use bian_rs::{
     client::UFuturesWSClient,
     error::BianResult,
-    response::{self, WebsocketResponse},
+    response::{self, WebsocketResponse, DepthOrder, WSFuturesDepth},
 };
+use serde::Deserialize;
 
 use crate::client::init_client;
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    
+    static ref HASHMAP: HashMap<f64, DepthOrder> = {
+        let mut m = HashMap::new();
+        m
+    };
+    static ref COUNT: usize = HASHMAP.len();
+}
+
+// static mut order_book_map = HashMap::<f64,DepthOrder>::new();
+
 
 // 订阅 wss://fstream.binance.com/stream?streams=btcusdt@depth
 // 开始缓存收到的更新。同一个价位，后收到的更新覆盖前面的。
@@ -26,9 +43,19 @@ pub async fn get_ws_order_book(symbol: &str) {
     let mut stream = ws_client.orderbook_depth(symbol.to_string()).unwrap();
     //保存数据到内存中
     for _ in 0..5 {
+        let otder_book = stream.read_stream_single().unwrap();
+        // order_book_map.insert(otder_book.otder_book);
         dbg!(stream.read_stream_single().unwrap());
     }
 }
+
+
+pub async fn update_order_book(otder_book:WSFuturesDepth){
+
+}
+
+
+
 struct WsClient(UFuturesWSClient);
 
 impl WsClient {
@@ -43,4 +70,36 @@ impl WsClient {
         let channel = "depth".to_string();
         self.0.build_single(symbol, &channel)
     }
+}
+
+/// 有限档深度信息
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WSFuturesOrderBook {
+    /// 事件类型
+    #[serde(rename = "e")]
+    pub event_type: String,
+    /// 事件推送时间
+    #[serde(rename = "E")]
+    pub event_time: i64,
+    /// 交易时间
+    #[serde(rename = "T")]
+    pub trade_time: i64,
+    /// 交易对
+    #[serde(rename = "s")]
+    pub symbol: String,
+    /// 更新ID
+    #[serde(rename = "u")]
+    pub update_id: usize,
+    /// ???
+    #[serde(rename = "U")]
+    pub upper_u: usize,
+    /// ???
+    pub pu: usize,
+    /// 买方
+    #[serde(rename = "b")]
+    pub buy: HashMap<f64,DepthOrder>,
+    /// 卖方
+    #[serde(rename = "a")]
+    pub sell: HashMap<f64,DepthOrder>,
 }

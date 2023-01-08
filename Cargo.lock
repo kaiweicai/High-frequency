@@ -371,6 +371,9 @@ version = "0.0.1"
 dependencies = [
  "bian-rs",
  "dotenv",
+ "lazy_static",
+ "serde",
+ "serde_json",
  "tokio",
  "tungstenite",
  "url",
