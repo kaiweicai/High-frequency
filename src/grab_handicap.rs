@@ -1,26 +1,34 @@
 // 抢盘口做市策略, 最基础的做市策略，买一卖一抢单抢盘口, 赚买一卖一的差价.
 // 比如现在卖1是60买1是70, 此策略会以65为中界，65以下布满买单，65以上布满卖单, 因为需要不停的调整订单布局，暂起名为高频逼近型
 // 注意: 模拟测试GetTicker的买一卖一固定差价为1.6, 实际效果需要实盘测试
-use std::{collections::{HashMap, BTreeMap}, iter::Map, fmt};
+use std::{collections::{HashMap, BTreeMap}, iter::Map, fmt, sync::Arc};
 
 use bian_rs::{
     client::UFuturesWSClient,
     error::BianResult,
-    response::{self, WebsocketResponse, DepthOrder, WSFuturesDepth}, params,
+    response::{self, WebsocketResponse, DepthOrder, WSFuturesDepth, FuturesDepth}, params,
 };
 use serde::{Deserialize, Deserializer, de::{Visitor, SeqAccess, Unexpected}};
+use tokio::sync::Mutex;
 
 use crate::client::{self,init_ws_client};
 
 use lazy_static::lazy_static;
 
+type OrderBookTreeMap = Arc<Mutex<BTreeMap<f64, DepthOrder>>>;
+type OrderBookDepth = Arc<Mutex<Vec<DepthOrder>>>;
+
 lazy_static! {
     
-    static ref HASHMAP: HashMap<f64, DepthOrder> = {
-        let mut m = HashMap::new();
-        m
+    static ref order_book_tree_map: OrderBookTreeMap = {
+        Arc::new(Mutex::new(BTreeMap::new()))
     };
-    static ref COUNT: usize = HASHMAP.len();
+    static ref ask_book_depth: OrderBookDepth = {
+        Arc::new(Mutex::new(Vec::new()))
+    };
+    static ref bid_book_depth: OrderBookDepth = {
+        Arc::new(Mutex::new(Vec::new()))
+    };
 }
 
 // static mut order_book_map = HashMap::<f64,DepthOrder>::new();
@@ -37,6 +45,13 @@ lazy_static! {
 
 ///获取order_book的websocket数据。
 pub async fn get_ws_order_book(symbol: &str) {
+
+    let mut init_orderbook = get_init_order_book(symbol).await;
+    // ask_book_depth.clone().lock().await.append(&mut init_orderbook.asks);
+    ask_book_depth.clone().lock().await.append(&mut init_orderbook.asks);
+    bid_book_depth.clone().lock().await.append(&mut init_orderbook.bids);
+    println!("ask_book_depth is:{:?}",ask_book_depth.clone().lock().await);
+
     let ws_client = client::init_ws_client();
     let ws_client = WsClient(ws_client);
     let mut stream = ws_client.orderbook_depth(symbol.to_string()).unwrap();
@@ -56,6 +71,17 @@ pub async fn get_ws_order_book(symbol: &str) {
         }
        
     }
+}
+
+pub async fn get_init_order_book(symbol: &str)->FuturesDepth{
+    let client = client::init_client();
+    let param = params::PDepth {
+        symbol: symbol.to_string(),
+        limit: 500,
+    };
+    let order_book = client.depth(param).await.unwrap();
+    order_book
+    // dbg!(client.depth(param).await.unwrap());
 }
 
 #[tokio::test]

@@ -21,7 +21,11 @@ async fn main() {
     // for _ in 0..5 {
     //     dbg!(stream.read_stream_single().unwrap());
     // }
-    high_frequency::grab_handicap::get_ws_order_book("btcusdt").await;
+    // tokio::spawn(async move {
+        high_frequency::grab_handicap::get_ws_order_book("btcusdt").await;
+    // });
+    println!("start main!");
+    
 }
 
 // #[test]
