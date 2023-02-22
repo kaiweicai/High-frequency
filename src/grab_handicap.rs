@@ -33,6 +33,11 @@ lazy_static! {
 
 // static mut order_book_map = HashMap::<f64,DepthOrder>::new();
 
+impl bid_book_depth{
+    pub fn update_order(&mut self,updateOrder:Vec<DepthOrder>){
+
+    }
+}
 
 // 订阅 wss://fstream.binance.com/stream?streams=btcusdt@depth
 // 开始缓存收到的更新。同一个价位，后收到的更新覆盖前面的。
@@ -60,9 +65,10 @@ pub async fn get_ws_order_book(symbol: &str) {
         match stream.read_stream_single(){
             Ok(order_book)=>{
                  // order_book_map.insert(order_book.order_book);
-                println!("order_book.sell is:{:#?}",order_book.sell);
-                println!("--------------------------------------------------------");
-                println!("order_book.buy is:{:#?}",order_book.buy);
+                 println!("order_book is:{:#?}",order_book);
+                // println!("order_book.sell is:{:#?}",order_book.sell);
+                // println!("--------------------------------------------------------");
+                // println!("order_book.buy is:{:#?}",order_book.buy);
                 // dbg!(stream.read_stream_single().unwrap());
             },
             Err(e)=>{
