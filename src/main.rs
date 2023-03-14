@@ -21,9 +21,10 @@ async fn main() {
     // for _ in 0..5 {
     //     dbg!(stream.read_stream_single().unwrap());
     // }
-    // tokio::spawn(async move {
+    // tokio::spawn(
         high_frequency::grab_handicap::get_ws_order_book("btcusdt").await;
-    // });
+    // ).await;
+    // high_frequency::grab_handicap::init_order_book("BTCUSDT").await;
     println!("start main!");
     
 }

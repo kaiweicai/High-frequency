@@ -17,7 +17,8 @@ categories = ["cryptography"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-bian-rs = { version = "0.2.0", path = "./bian-rs" }
+# bian-rs = { version = "0.2.0", path = "./bian-rs" }
+bian-rs = { git = "https://github.com/kaiweicai/bian-rs.git",branch="main" }
 dotenv = "0.15.0"
 url = "2.3.1"
 tungstenite = { git = "https://github.com/PrivateRookie/tungstenite-rs.git", branch = "proxy", version = "0.13" }
